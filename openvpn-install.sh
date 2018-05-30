@@ -70,7 +70,7 @@ if [[ -e /etc/openvpn/server.conf ]]; then
 			echo "Tell me a name for the client certificate."
 			echo "Please, use one word only, no special characters."
 			read -p "Client name: " -e CLIENT
-			cd /etc/openvpn/easy-rsa/
+			cd /etc/openvpn/easy-rsa/ || exit
 			./easyrsa build-client-full $CLIENT nopass
 			# Generates the custom client.ovpn
 			newclient "$CLIENT"
@@ -99,7 +99,7 @@ if [[ -e /etc/openvpn/server.conf ]]; then
 			echo
 			read -p "Do you really want to revoke access for client $CLIENT? [y/N]: " -e REVOKE
 			if [[ "$REVOKE" = 'y' || "$REVOKE" = 'Y' ]]; then
-				cd /etc/openvpn/easy-rsa/
+				cd /etc/openvpn/easy-rsa/ || exit
 				./easyrsa --batch revoke $CLIENT
 				EASYRSA_CRL_DAYS=3650 ./easyrsa gen-crl
 				rm -f pki/reqs/$CLIENT.req
@@ -231,7 +231,7 @@ else
 	mv /etc/openvpn/EasyRSA-3.0.4/ /etc/openvpn/easy-rsa/
 	chown -R root:root /etc/openvpn/easy-rsa/
 	rm -f ~/easyrsa.tgz
-	cd /etc/openvpn/easy-rsa/
+	cd /etc/openvpn/easy-rsa/ || exit
 	# Create the PKI, set up the CA, the DH params and the server + client certificates
 	./easyrsa init-pki
 	./easyrsa --batch build-ca nopass
@@ -259,8 +259,8 @@ auth SHA512
 tls-auth ta.key 0
 topology subnet
 server 10.8.0.0 255.255.255.0
-ifconfig-pool-persist ipp.txt" > /etc/openvpn/server.conf
-	echo 'push "redirect-gateway def1 bypass-dhcp"' >> /etc/openvpn/server.conf
+ifconfig-pool-persist ipp.txt
+push \"redirect-gateway def1 bypass-dhcp\"" > /etc/openvpn/server.conf
 	# DNS
 	case $DNS in
 		1)
